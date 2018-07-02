@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd" >
+    
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url" value="jdbc:postgresql://localhost:5432/energis" />
+        <property name="username" value="energis_owner" />
+        <property name="password" value="internal" />
+    </bean>
+    
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="tech/energis/example/entity/mybatis-config.xml" />
+    </bean>
+    
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+    
+    <bean id="organizationService" class="tech.energis.example.exe.OrganizationServiceImplSpring">
+        <property name="organizationFinder" ref="organizationFinder" />
+    </bean>
+    <bean id="organizationServiceEx" class="tech.energis.example.exe.OrganizationServiceExImplSpring">
+        <property name="organizationPresentingFinder" ref="organizationPresentingFinder" />
+    </bean>
+    
+    <bean id="dbDao" abstract="true">
+        <constructor-arg name="sqlSession" ref="sqlSession" />
+    </bean>
+    
+    <bean id="organizationImplList" class="tech.energis.example.entity.OrganizationImplList" />
+    <bean id="organizationImplBatis" parent="dbDao" class="tech.energis.example.entity.OrganizationImplBatis" />
+    <bean id="organizationPresentingImplBatis" parent="dbDao" class="tech.energis.example.entity.OrganizationPresentingImplBatis" />
+    
+    <alias name="organizationImplBatis" alias="organizationFinder" />
+    <alias name="organizationPresentingImplBatis" alias="organizationPresentingFinder" />
+</beans>
